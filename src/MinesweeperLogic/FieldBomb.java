@@ -1,5 +1,8 @@
 package MinesweeperLogic;
 
-public class FieldBomb implements Field {
+public class FieldBomb extends Field implements FieldInterface  {
 
+    public FieldBomb(int fieldId) {
+        setId(fieldId);
+    }
 }
