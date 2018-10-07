@@ -5,18 +5,18 @@ import MinesweeperLogic.FieldEmpty;
 import MinesweeperLogic.FieldINumber;
 import MinesweeperLogic.FieldInterface;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
 public class Main {
     static ArrayList<FieldInterface> gameBoard;
+    //static int Array[][];
     static FieldINumber testNr;
     static FieldEmpty testEm;
     static FieldBomb testBo;
+    enum direction{RIGHT,LEFT,DOWN,UP,NON, RIGHTUP,RIGHTDOWN, LEFTUP, LEFTDOWN };
 
-    public enum direction {
-        RIGHT,LEFT,UP,DOWN, NON
-    }
 
     public static void main(String[] args) {
     //TODO: Get input though the UI instead of commandline
@@ -26,7 +26,15 @@ public class Main {
 
 
     //TODO: Implement gameboard initialisation
-
+        /*
+        int[][] Array = new int[10][16];
+        int id = 0;
+        for (int i = 0; i < Array.length; i++) {
+            for (int j = 0; j < 16; j++) {
+                Array[i][j] = id++;
+            }
+        }
+        */
         gameBoard = new ArrayList<>();
 
         //TODO: Generate random fields
@@ -52,22 +60,23 @@ public class Main {
             System.out.println(""+number);
 
             try{
-                gameBoard.get(number).setShown();
+                //gameBoard.get(number).setShown();
                 if(gameBoard.get(number).getClass().equals(testNr.getClass())){
                     System.out.println("It was a Number");
+                    //gameBoard.get(number).setShown();
+                    try{
+                        visitField(number, direction.NON);
+                    }catch (Exception ex){
+
+                    }
 
                 }else if(gameBoard.get(number).getClass().equals(testEm.getClass())){
                     System.out.println("It was Empty");
-                    boolean cond = true;
-                    //while(cond){
                         try{
                             visitField(number, direction.NON);
                         }catch (Exception ex){
 
                         }
-
-
-                    //}
 
                 }else if(gameBoard.get(number).getClass().equals(testBo.getClass())){
                     System.err.println("It was Bomb");
@@ -83,52 +92,46 @@ public class Main {
         }
     }
     private static void visitField(int number, direction direction){
+        //Check if its already been shown
+        if(gameBoard.get(number).isShown()){
+            return;
+        }
+
         //RIGHT
         //Testing if the number just went from one row to row++
-        if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
-            direction == direction.RIGHT && number % 10 == 0 && number != 0){
-            System.out.println("If1 blev kaldt");
-            return;
-        }else if(gameBoard.get(number).getClass().equals(testNr.getClass()) && direction == direction.RIGHT){
-            //If the field is a number, show it and return
-            gameBoard.get(number).setShown();
-            System.out.println("Ifelse1 blev kaldt");
-            return;
-        }else if(gameBoard.get(number).getClass().equals(testEm.getClass()) && direction == direction.RIGHT){
-            gameBoard.get(number).setShown();
-            System.out.println("Ifelse1 empty blev kaldt");
+        if(direction == direction.RIGHT){
+            if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
+                    number % 10 == 0 && number != 0){
+                return;
+            }
+        }else if(direction == direction.LEFT){
+            //LEFT
+            //Testing if the number just went from one row to row--
+            if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
+                    number % 10 == 9){
+                return;
+            }
+        }else if(direction == direction.UP){
+            //UP
+            //Testing if the number just went from one row to row--
+            if(gameBoard.get(number).getClass().equals(testBo.getClass())){
+                return;
+            }
+        }else if(direction == direction.DOWN){
+            //DOWN
+            //Testing if the number just went from one row to row++
+            if(gameBoard.get(number).getClass().equals(testBo.getClass())){
+                return;
+            }
         }
 
-        //LEFT
-        //Testing if the number just went from one row to row--
-        if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
-                direction == direction.LEFT && number % 10 == 9){
-            System.out.println("If2 blev kaldt");
-            return;
-        }else if(gameBoard.get(number).getClass().equals(testNr.getClass()) && direction == direction.LEFT){
+        //They all need to check for these
+        if(gameBoard.get(number).getClass().equals(testNr.getClass())){
             //If the field is a number, show it and return
             gameBoard.get(number).setShown();
-            System.out.println("Ifelse2 blev kaldt");
             return;
-        }else if(gameBoard.get(number).getClass().equals(testEm.getClass()) && direction == direction.LEFT){
+        }else if(gameBoard.get(number).getClass().equals(testEm.getClass())){
             gameBoard.get(number).setShown();
-            System.out.println("Ifelse1 empty blev kaldt");
-        }
-
-        //UP
-        //Testing if the number just went from one row to row--
-        if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
-                direction == direction.UP){
-            System.out.println("If3 blev kaldt");
-            return;
-        }else if(gameBoard.get(number).getClass().equals(testNr.getClass()) && direction == direction.UP){
-            //If the field is a number, show it and return
-            gameBoard.get(number).setShown();
-            System.out.println("Ifelse3 blev kaldt");
-            return;
-        }else if(gameBoard.get(number).getClass().equals(testEm.getClass()) && direction == direction.UP){
-            gameBoard.get(number).setShown();
-            System.out.println("Ifelse3 empty blev kaldt");
         }
 
         //Go right
@@ -154,16 +157,6 @@ public class Main {
             }
         }
 
-        //Go down
-        if(direction == direction.UP){
-
-        }else{
-            try{
-                visitField(number-10,direction.DOWN);
-            }catch(Exception ex){
-
-            }
-        }
         //Go up
         if(direction == direction.DOWN){
 
@@ -173,6 +166,12 @@ public class Main {
             }catch(Exception ex){
 
             }
+        }
+        //Go down
+        try{
+            visitField(number+10,direction.DOWN);
+        }catch(Exception ex){
+
         }
 
     }
@@ -184,7 +183,7 @@ public class Main {
         int testId = 0;
         for ( FieldInterface gameBoard:  gameBoard){
             if(testId%10 == 0 && testId != 0){
-                System.out.println(""+testId);
+                System.out.println(" |"+(testId-1));
             }
             if(gameBoard.getClass().equals(testNr.getClass())){
                 System.out.print(" "+gameBoard.getValue());
@@ -198,7 +197,7 @@ public class Main {
             }
             testId++;
         }
-        System.out.println(""+testId);
+        System.out.println(" |"+(testId-1));
     }
 
     private static void generate() {

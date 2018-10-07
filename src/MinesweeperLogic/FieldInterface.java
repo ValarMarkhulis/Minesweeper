@@ -7,5 +7,6 @@ public interface FieldInterface {
     void setValue(char character);
     char getValue();
     void setShown();
+    boolean isShown();
 
 }

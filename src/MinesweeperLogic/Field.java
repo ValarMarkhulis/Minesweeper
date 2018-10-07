@@ -2,6 +2,11 @@ package MinesweeperLogic;
 
 public class Field {
     private boolean flagSet = false;
+
+    public boolean isShown() {
+        return isShown;
+    }
+
     private boolean isShown = false;
     private int fieldId = 0;
     char fieldcharacter = '?';
