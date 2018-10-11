@@ -39,7 +39,10 @@ public class Main {
 
         //TODO: Generate random fields
         generate();
+        gameBoard.get(12).setFlagSet(true);
+        //gameBoard.get(37).setFlagSet(true);
         drawAsciiBoard();
+
 
 
         testNr = new FieldINumber(1, -1);
@@ -49,10 +52,12 @@ public class Main {
         while(true){
             System.out.println("\n\n");
 
-            System.out.println("Skriv kolonne 1-10");
+            System.out.println("Write 1 for flag and 0 for guess");
+            int flagOrNot = tastatur.nextInt();
+            System.out.println("Which column: 1-10");
             int x = tastatur.nextInt();
             tastatur.nextLine();
-            System.out.println("Skriv række 1-16");
+            System.out.println("Which row: 1-16");
             int y = tastatur.nextInt();
             tastatur.nextLine();
 
@@ -60,8 +65,14 @@ public class Main {
             System.out.println(""+number);
 
             try{
-                //gameBoard.get(number).setShown();
-                if(gameBoard.get(number).getClass().equals(testNr.getClass())){
+                if(flagOrNot == 1){
+                    boolean flagstatus = gameBoard.get(number).isFlagSet();
+                    gameBoard.get(number).setFlagSet(!flagstatus);
+
+                }else if(gameBoard.get(number).isFlagSet()){
+                    System.out.println("You cant guess on a field with a flag on it!");
+
+                }else if(gameBoard.get(number).getClass().equals(testNr.getClass()) ){
                     System.out.println("It was a Number");
                     //gameBoard.get(number).setShown();
                     try{
@@ -93,8 +104,14 @@ public class Main {
     }
     private static void visitField(int number, direction direction){
         //Check if its already been shown
-        if(gameBoard.get(number).isShown()){
+        if( gameBoard.get(number).isFlagSet() ||
+            (gameBoard.get(number).isShown() && !gameBoard.get(number).getClass().equals(testNr.getClass()))){
             return;
+        }
+
+        //TODO Implement, when the player presses a shown number. Im not sure about the logic?
+        if((gameBoard.get(number).isShown() && gameBoard.get(number).getClass().equals(testNr.getClass()))){
+
         }
 
         //RIGHT
@@ -123,6 +140,30 @@ public class Main {
             if(gameBoard.get(number).getClass().equals(testBo.getClass())){
                 return;
             }
+        }else if(direction == direction.RIGHTUP){
+            //RIGHT UP
+            if(gameBoard.get(number).getClass().equals(testBo.getClass())||
+                    number % 10 == 0){
+                return;
+            }
+        }else if(direction == direction.LEFTUP){
+            //LEFT UP
+            if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
+                    number % 10 == 9){
+                return;
+            }
+        }else if(direction == direction.RIGHTDOWN){
+            //LEFT UP
+            if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
+                    number % 10 == 0){
+                return;
+            }
+        }else if(direction == direction.LEFTDOWN){
+            //LEFT UP
+            if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
+                    number % 10 == 9){
+                return;
+            }
         }
 
         //They all need to check for these
@@ -136,7 +177,6 @@ public class Main {
 
         //Go right
         if(direction == direction.LEFT){
-
         }else{
             try{
                 visitField(number+1,direction.RIGHT);
@@ -148,7 +188,6 @@ public class Main {
 
         //Go left
         if(direction == direction.RIGHT){
-
         }else{
             try{
                 visitField(number-1,direction.LEFT);
@@ -159,7 +198,6 @@ public class Main {
 
         //Go up
         if(direction == direction.DOWN){
-
         }else{
             try{
                 visitField(number-10,direction.UP);
@@ -167,13 +205,59 @@ public class Main {
 
             }
         }
-        //Go down
-        try{
-            visitField(number+10,direction.DOWN);
-        }catch(Exception ex){
 
+        if(direction == direction.UP){
+        }else {
+            //Go down
+            try{
+                visitField(number+10,direction.DOWN);
+            }catch(Exception ex){
+
+            }
         }
 
+        //Go up and right
+        if(direction == direction.LEFTDOWN){
+        }else{
+            try{
+                visitField((number-10)+1,direction.RIGHTUP);
+            }catch(Exception ex){
+
+            }
+        }
+
+        //Go down and right
+        if(direction == direction.RIGHTDOWN){
+        }else {
+
+            try {
+                visitField((number - 10) - 1, direction.LEFTUP);
+            } catch (Exception ex) {
+
+            }
+        }
+
+        //Go down and right
+        if(direction == direction.LEFTUP){
+        }else {
+
+            try {
+                visitField((number + 10) + 1, direction.RIGHTDOWN);
+            } catch (Exception ex) {
+
+            }
+        }
+
+        //Go down and left
+        if(direction == direction.RIGHTUP){
+        }else {
+
+            try {
+                visitField((number + 10) - 1, direction.LEFTDOWN);
+            } catch (Exception ex) {
+
+            }
+        }
     }
 
     private static void drawAsciiBoard() {
@@ -380,5 +464,192 @@ public class Main {
         gameBoard.add(new FieldINumber(1,id));        id++;
         gameBoard.add(new FieldEmpty(id));        id++;
         gameBoard.add(new FieldEmpty(id));
+    }
+    private static void generate2() {
+        int id = 0;
+        //Række 0
+        for(int i = 0; i<4;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldINumber(1,id));        id++;
+        }
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+
+        // Række 1
+        for(int i = 0; i<4;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+
+        // Række 2
+        for(int i = 0; i<4;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldINumber(1,id));        id++;
+        }
+
+        // Række 3
+        for(int i = 0; i<5;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+
+        // Række 4
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        for(int i = 0; i<4;i++){
+            gameBoard.add(new FieldINumber(1,id));        id++;
+        }
+
+        // Række 5
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        for(int i = 0; i<4;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+
+        // Række 6
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+
+        // Række 7
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(4,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+
+        // Række 8
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(4,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+
+        // Række 9
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldINumber(1,id));        id++;
+        }
+
+        // Række 10
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldINumber(1,id));        id++;
+        }
+
+        // Række 11
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldEmpty(id));        id++;
+        }
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+
+        // Række 12
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+
+        // Række 13
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        for(int i = 0; i<4;i++){
+            gameBoard.add(new FieldINumber(1,id));        id++;
+        }
+        for(int i = 0; i<3;i++){
+            gameBoard.add(new FieldINumber(2,id));        id++;
+        }
+        gameBoard.add(new FieldINumber(1,id));        id++;
+
+        // Række 14
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(3,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+
+        // Række 15
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldEmpty(id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+        gameBoard.add(new FieldBomb(id));        id++;
+        gameBoard.add(new FieldINumber(2,id));        id++;
+        gameBoard.add(new FieldINumber(1,id));        id++;
+
     }
 }

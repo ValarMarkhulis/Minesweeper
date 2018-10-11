@@ -8,5 +8,7 @@ public interface FieldInterface {
     char getValue();
     void setShown();
     boolean isShown();
+    boolean isFlagSet();
+    void setFlagSet(boolean flagSet);
 
 }
