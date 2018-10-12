@@ -4,8 +4,9 @@ import MinesweeperLogic.FieldBomb;
 import MinesweeperLogic.FieldEmpty;
 import MinesweeperLogic.FieldINumber;
 import MinesweeperLogic.FieldInterface;
+import MinesweeperUI.GUI;
 
-import java.lang.reflect.Array;
+import javax.swing.*;
 import java.util.ArrayList;
 
 
@@ -15,6 +16,7 @@ public class Main {
     static FieldINumber testNr;
     static FieldEmpty testEm;
     static FieldBomb testBo;
+    static int Boombsleft = 24;
     enum direction{RIGHT,LEFT,DOWN,UP,NON, RIGHTUP,RIGHTDOWN, LEFTUP, LEFTDOWN };
 
 
@@ -39,9 +41,17 @@ public class Main {
 
         //TODO: Generate random fields
         generate();
-        gameBoard.get(12).setFlagSet(true);
+        gameBoard.get(12).setFlagSet(true); Boombsleft--;
         //gameBoard.get(37).setFlagSet(true);
         drawAsciiBoard();
+
+        JFrame frame = new JFrame("GUI");
+        frame.setContentPane(new GUI().JPanel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+
+
 
 
 
@@ -49,8 +59,9 @@ public class Main {
         testEm = new FieldEmpty(-1);
         testBo = new FieldBomb(-1);
 
-        while(true){
+        while(Boombsleft != 0){
             System.out.println("\n\n");
+            System.out.println("Antal bomber: "+Boombsleft);
 
             System.out.println("Write 1 for flag and 0 for guess");
             int flagOrNot = tastatur.nextInt();
@@ -68,31 +79,48 @@ public class Main {
                 if(flagOrNot == 1){
                     boolean flagstatus = gameBoard.get(number).isFlagSet();
                     gameBoard.get(number).setFlagSet(!flagstatus);
+                    flagstatus = !flagstatus;
+
+                    if(flagstatus && gameBoard.get(number).getClass().equals(testBo.getClass())){
+                        Boombsleft--;
+                    }else if(!flagstatus && gameBoard.get(number).getClass().equals(testBo.getClass())){
+                        Boombsleft++;
+                    }
 
                 }else if(gameBoard.get(number).isFlagSet()){
                     System.out.println("You cant guess on a field with a flag on it!");
 
                 }else if(gameBoard.get(number).getClass().equals(testNr.getClass()) ){
-                    System.out.println("It was a Number");
+
                     //gameBoard.get(number).setShown();
                     try{
-                        visitField(number, direction.NON);
+                        if(gameBoard.get(number).isShown()){
+                            //TODO Implement, when the player presses a shown number. Im not sure about the logic?
+                            visitShownField(number);
+                        }else{
+                            System.out.println("It was a Number was CALLED!");
+                            visitField(number, direction.NON);
+                        }
                     }catch (Exception ex){
 
                     }
 
                 }else if(gameBoard.get(number).getClass().equals(testEm.getClass())){
-                    System.out.println("It was Empty");
                         try{
-                            visitField(number, direction.NON);
+                            if(gameBoard.get(number).isShown()){
+                                System.out.println("You can't press a empty field!");
+                            }else{
+                                System.out.println("It was a Empty");
+                                visitField(number, direction.NON);
+                            }
+
                         }catch (Exception ex){
 
                         }
 
                 }else if(gameBoard.get(number).getClass().equals(testBo.getClass())){
-                    System.err.println("It was Bomb");
+                    System.err.println("It was a Bomb");
                     System.exit(-1);
-
                 }
 
             }catch (Exception ex){
@@ -102,17 +130,88 @@ public class Main {
             drawAsciiBoard();
         }
     }
+
+    /**
+     * This function will be called if the player presses a number which is shown. The function
+     * will then visit all surrounding fields and shown them if they are number or empty, but
+     * the player will lose if one of the fields is a bomb.
+     * @param number
+     */
+    private static void visitShownField(int number) {
+
+        //Visit RIGHT
+        if((number+1) % 10 != 0 && (number+1) != 0){
+            testField(number+1);
+        }
+
+        //Visit LEFT
+        if((number-1) % 10 != 9){
+            testField(number-1);
+        }
+
+        //Visit UP
+        System.out.println("Visit up blev kaldt");
+        testField(number-10);
+
+        //Visit DOWN
+        System.out.println("Visit downn blev kaldt");
+        testField(number+10);
+
+        //Visit UP RIGHT
+        System.out.println("Visit UP RIGHT blev kaldt");
+        if((number-9) % 10 != 0){
+            testField(number-9);
+        }
+
+        //Visit UP LEFT
+        System.out.println("Visit UP LEFT blev kaldt");
+        if((number-11) % 10 != 9){
+            testField(number-11);
+        }
+
+        //Visit DOWN RIGHT
+        System.out.println("Visit DOWN RIGHT blev kaldt");
+        if((number+11) % 10 != 0){
+            testField(number+11);
+        }
+
+        //Visit DOWN LEFT
+        System.out.println("Visit DOWN LEFT blev kaldt");
+        if((number+9) % 10 != 9){
+            testField(number+9);
+        }
+
+
+    }
+
+    private static void testField(int number) {
+        try{
+            //If the flag has been set skip it
+            if(gameBoard.get(number).isFlagSet()){
+                return;
+            }else if(gameBoard.get(number).getClass().equals(testBo.getClass())){
+                gameBoard.get(number).setShown();
+                System.err.println("It was a Bomb");
+                System.exit(-1);
+            }else if(gameBoard.get(number).getClass().equals(testEm.getClass())){
+                System.out.println("Test kaldt");
+                visitField(number, direction.NON);
+            }else if(gameBoard.get(number).getClass().equals(testNr.getClass())){
+                System.out.println("A number field has been reveald!");
+                gameBoard.get(number).setShown();
+            }
+        }catch (Exception ex){
+
+        }
+    }
+
     private static void visitField(int number, direction direction){
-        //Check if its already been shown
+        //Check if its already been shown or a flag has been set
         if( gameBoard.get(number).isFlagSet() ||
-            (gameBoard.get(number).isShown() && !gameBoard.get(number).getClass().equals(testNr.getClass()))){
+            gameBoard.get(number).isShown() ){
             return;
         }
 
-        //TODO Implement, when the player presses a shown number. Im not sure about the logic?
-        if((gameBoard.get(number).isShown() && gameBoard.get(number).getClass().equals(testNr.getClass()))){
-
-        }
 
         //RIGHT
         //Testing if the number just went from one row to row++
@@ -226,7 +325,7 @@ public class Main {
             }
         }
 
-        //Go down and right
+        //Go up and left
         if(direction == direction.RIGHTDOWN){
         }else {
 
