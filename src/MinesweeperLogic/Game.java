@@ -7,43 +7,30 @@ import java.util.ArrayList;
 public class Game {
 
     public ArrayList<FieldInterface> gameBoard;
-    //static int Array[][];
-    static FieldINumber testNr;
-    static FieldEmpty testEm;
-    static FieldBomb testBo;
-    static int Boombsleft = 24;
-    final int boombsOnStart = 24;
-    int hiddenFieldsleft = 160;
+    private FieldINumber testNr;
+    private FieldEmpty testEm;
+    private FieldBomb testBo;
+    private int Boombsleft = 24;
+    private final int boombsOnStart = 24;
+    private int hiddenFieldsleft = 160;
     public int flagsSet = 0;
-    enum direction{RIGHT,LEFT,DOWN,UP,NON, RIGHTUP,RIGHTDOWN, LEFTUP, LEFTDOWN };
-    boolean debug = true;
-    boolean debug2 = false;
+    public enum direction{RIGHT,LEFT,DOWN,UP,NON, RIGHTUP,RIGHTDOWN, LEFTUP, LEFTDOWN }
+    private boolean debug = true;
+    private boolean debug2 = false;
 
     public Game (){
 
-        //TODO: Get input though the UI instead of commandline
+
         //Get input
-        java.util.Scanner tastatur = new java.util.Scanner(System.in);
+        //java.util.Scanner tastatur = new java.util.Scanner(System.in);
 
-
-
-        //TODO: Implement gameboard initialisation
-        /*
-        int[][] Array = new int[10][16];
-        int id = 0;
-        for (int i = 0; i < Array.length; i++) {
-            for (int j = 0; j < 16; j++) {
-                Array[i][j] = id++;
-            }
-        }
-        */
         gameBoard = new ArrayList<>();
 
         //TODO: Generate random fields
-        generate2();
+        generate();
         //gameBoard.get(12).setFlagSet(true); Boombsleft--;
         //gameBoard.get(37).setFlagSet(true);
-        drawAsciiBoard();
+        //drawAsciiBoard();
         testNr = new FieldINumber(1, -1);
         testEm = new FieldEmpty(-1);
         testBo = new FieldBomb(-1);
@@ -147,7 +134,7 @@ public class Game {
      * This function will be called if the player presses a number which is shown. The function
      * will then visit all surrounding fields and shown them if they are number or empty, but
      * the player will lose if one of the fields is a bomb.
-     * @param number
+     * @param number Is the field number you are trying to visit
      */
     private int visitShownField(int number) {
         int status = 0;
@@ -240,49 +227,49 @@ public class Game {
 
         //RIGHT
         //Testing if the number just went from one row to row++
-        if(direction == direction.RIGHT){
+        if(direction == Game.direction.RIGHT){
             if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
                     number % 10 == 0 && number != 0){
                 return;
             }
-        }else if(direction == direction.LEFT){
+        }else if(direction == Game.direction.LEFT){
             //LEFT
             //Testing if the number just went from one row to row--
             if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
                     number % 10 == 9){
                 return;
             }
-        }else if(direction == direction.UP){
+        }else if(direction == Game.direction.UP){
             //UP
             //Testing if the number just went from one row to row--
             if(gameBoard.get(number).getClass().equals(testBo.getClass())){
                 return;
             }
-        }else if(direction == direction.DOWN){
+        }else if(direction == Game.direction.DOWN){
             //DOWN
             //Testing if the number just went from one row to row++
             if(gameBoard.get(number).getClass().equals(testBo.getClass())){
                 return;
             }
-        }else if(direction == direction.RIGHTUP){
+        }else if(direction == Game.direction.RIGHTUP){
             //RIGHT UP
             if(gameBoard.get(number).getClass().equals(testBo.getClass())||
                     number % 10 == 0){
                 return;
             }
-        }else if(direction == direction.LEFTUP){
+        }else if(direction == Game.direction.LEFTUP){
             //LEFT UP
             if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
                     number % 10 == 9){
                 return;
             }
-        }else if(direction == direction.RIGHTDOWN){
+        }else if(direction == Game.direction.RIGHTDOWN){
             //LEFT UP
             if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
                     number % 10 == 0){
                 return;
             }
-        }else if(direction == direction.LEFTDOWN){
+        }else if(direction == Game.direction.LEFTDOWN){
             //LEFT UP
             if(gameBoard.get(number).getClass().equals(testBo.getClass()) ||
                     number % 10 == 9){
@@ -302,10 +289,10 @@ public class Game {
         }
 
         //Go right
-        if(direction == direction.LEFT){
+        if(direction == Game.direction.LEFT){
         }else{
             try{
-                visitField(number+1,direction.RIGHT);
+                visitField(number+1, Game.direction.RIGHT);
             }catch(Exception ex){
 
             }
@@ -313,73 +300,73 @@ public class Game {
 
 
         //Go left
-        if(direction == direction.RIGHT){
+        if(direction == Game.direction.RIGHT){
         }else{
             try{
-                visitField(number-1,direction.LEFT);
+                visitField(number-1, Game.direction.LEFT);
             }catch(Exception ex){
 
             }
         }
 
         //Go up
-        if(direction == direction.DOWN){
+        if(direction == Game.direction.DOWN){
         }else{
             try{
-                visitField(number-10,direction.UP);
+                visitField(number-10, Game.direction.UP);
             }catch(Exception ex){
 
             }
         }
 
-        if(direction == direction.UP){
+        if(direction == Game.direction.UP){
         }else {
             //Go down
             try{
-                visitField(number+10,direction.DOWN);
+                visitField(number+10, Game.direction.DOWN);
             }catch(Exception ex){
 
             }
         }
 
         //Go up and right
-        if(direction == direction.LEFTDOWN){
+        if(direction == Game.direction.LEFTDOWN){
         }else{
             try{
-                visitField((number-10)+1,direction.RIGHTUP);
+                visitField((number-10)+1, Game.direction.RIGHTUP);
             }catch(Exception ex){
 
             }
         }
 
         //Go up and left
-        if(direction == direction.RIGHTDOWN){
+        if(direction == Game.direction.RIGHTDOWN){
         }else {
 
             try {
-                visitField((number - 10) - 1, direction.LEFTUP);
+                visitField((number - 10) - 1, Game.direction.LEFTUP);
             } catch (Exception ex) {
 
             }
         }
 
         //Go down and right
-        if(direction == direction.LEFTUP){
+        if(direction == Game.direction.LEFTUP){
         }else {
 
             try {
-                visitField((number + 10) + 1, direction.RIGHTDOWN);
+                visitField((number + 10) + 1, Game.direction.RIGHTDOWN);
             } catch (Exception ex) {
 
             }
         }
 
         //Go down and left
-        if(direction == direction.RIGHTUP){
+        if(direction == Game.direction.RIGHTUP){
         }else {
 
             try {
-                visitField((number + 10) - 1, direction.LEFTDOWN);
+                visitField((number + 10) - 1, Game.direction.LEFTDOWN);
             } catch (Exception ex) {
 
             }

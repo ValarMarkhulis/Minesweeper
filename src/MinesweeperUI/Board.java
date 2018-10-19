@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Timer;
 
 public class Board extends JPanel {
 
@@ -18,15 +19,19 @@ public class Board extends JPanel {
     private final int NUM_IMAGES = 13;
     private Game game;
     private JLabel flagSetStatusbar;
+    private Timer timer;
+    private JLabel timeLabel;
     private JLabel statusbar;
     private boolean debug = true;
 
 /*
 This code has been inspired by https://github.com/janbodnar/Java-Minesweeper-Game
  */
-    Board(Game game, JLabel flagSetStatusbar){
+    Board(Game game, JLabel flagSetStatusbar, Timer timer, JLabel timeLabel){
         this.game = game;
         this.flagSetStatusbar = flagSetStatusbar;
+        this.timer = timer;
+        this.timeLabel = timeLabel;
 
         setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT+90));
 
@@ -75,13 +80,36 @@ This code has been inspired by https://github.com/janbodnar/Java-Minesweeper-Gam
                     }
                     //Guess on a field
                     int status = game.guess(fieldID);
-                    repaint();
                     if(status == -1){
-                        JOptionPane.showMessageDialog(null, "Oh no, you have hit a bomb!");
+                        repaint();
+                        timer.cancel();
+                        int seconds = Integer.valueOf(timeLabel.getText().replaceAll("Time: ",""));
+                        int minutes = Math.floorDiv(seconds,60);
+                        if(minutes != 0){
+                            seconds = seconds-(minutes*60);
+                            if(minutes > 1)
+                                JOptionPane.showMessageDialog(null, "Oh no, you have hit a bomb! Time was "+minutes+" minutes and "+seconds+" seconds");
+                            else
+                                JOptionPane.showMessageDialog(null, "Oh no, you have hit a bomb! Time was "+minutes+" minute and "+seconds+" seconds");
+                        }else{
+                            JOptionPane.showMessageDialog(null, "Oh no, you have hit a bomb! Time was "+seconds+" seconds");
+                        }
+
                         System.exit(-1);
                     }else if(status == 0){
                         repaint();
-                        JOptionPane.showMessageDialog(null, "You have won!");
+                        timer.cancel();
+                        int seconds = Integer.valueOf(timeLabel.getText().replaceAll("Time: ",""));
+                        int minutes = Math.floorDiv(seconds,60);
+                        if(minutes != 0){
+                            seconds = seconds-(minutes*60);
+                            if(minutes > 1)
+                                JOptionPane.showMessageDialog(null, "You have won! And you did it in "+minutes+" minutes and "+seconds+" seconds");
+                            else
+                                JOptionPane.showMessageDialog(null, "You have won! And you did it in "+minutes+" minute and "+seconds+" seconds");
+                        }else{
+                            JOptionPane.showMessageDialog(null, "You have won! And you did it in "+seconds+" seconds");
+                        }
                         System.exit(-1);
                     }
                 }
