@@ -17,6 +17,7 @@ public class GUI extends JFrame {
     private JLabel statusbar;
     private Game game;
     static int flagSet = 0;
+    Board_Fake BF;
 
     public Timer timer = new Timer();
     private JLabel timeLabel = new JLabel(" ");
@@ -46,16 +47,22 @@ public class GUI extends JFrame {
         p.setSize(50,50);
         add(p,BorderLayout.EAST);
 
-        add(new Board(game,flagSetStatusbar,timer,timeLabel));
 
-
+        BF = new Board_Fake(this);
+        add(BF);
 
         setTitle("Minesweeper");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-
         setResizable(false);
+        pack();
+    }
+
+    public void test(){
+        remove(BF);
+        game.generateRandomMap(BF.chosenField);
+        add(new Board(game,flagSetStatusbar,timer,timeLabel));
         pack();
         timer.schedule(new UpdateUITask(), 0, 1000);
 

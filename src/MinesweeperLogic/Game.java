@@ -1,7 +1,7 @@
 package MinesweeperLogic;
 
 import java.util.ArrayList;
-
+import java.util.Random;
 
 
 public class Game {
@@ -27,7 +27,7 @@ public class Game {
         gameBoard = new ArrayList<>();
 
         //TODO: Generate random fields
-        generate();
+        //generate();
         //gameBoard.get(12).setFlagSet(true); Boombsleft--;
         //gameBoard.get(37).setFlagSet(true);
         //drawAsciiBoard();
@@ -55,6 +55,7 @@ public class Game {
 
         */
     }
+
     public int toggleFlag(int fieldID){
         boolean flagstatus = !gameBoard.get(fieldID).isFlagSet();
         gameBoard.get(fieldID).setFlagSet(flagstatus);
@@ -763,6 +764,63 @@ public class Game {
         gameBoard.add(new FieldBomb(id));        id++;
         gameBoard.add(new FieldINumber(2,id));        id++;
         gameBoard.add(new FieldINumber(1,id));        id++;
+
+    }
+
+    public void generateRandomMap(int chosenField) {
+        System.out.println("Generating the map from the seed: "+chosenField);
+
+        //Fill the arrays with zeros
+        int[][] Array = new int[16][10];
+        int id = 0;
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 10; j++) {
+                Array[i][j] = 0;
+            }
+        }
+        //Puts a special character into the chosenField so it cant be a number or a bomb
+        Array[chosenField/10][chosenField%10] = -2;
+
+        Random rand = new Random();
+
+        ArrayList<Integer> used_Numbers_list = new ArrayList<Integer>();
+        //Put in the chosen number, so it doesnt get overridden
+        used_Numbers_list.add(chosenField);
+
+        for (int i = 1;i<25;i++){
+             int  n = rand.nextInt(159);
+             System.out.println("n er: "+n);
+             if(used_Numbers_list.contains(n)){
+                 i--;
+             }else{
+                 used_Numbers_list.add(n);
+             }
+         }
+
+
+        //System.out.println("LIsten: "+used_Numbers_list.toString());
+        //Remove the chosenfield from the list
+        used_Numbers_list.remove(0);
+        //System.out.println("LIsten: "+used_Numbers_list.toString());
+
+        //Put bombs on the positions from the used_numbers_list
+        for (int number: used_Numbers_list) {
+            Array[number/10][number%10] = -1;
+        }
+        used_Numbers_list = null;
+
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 10; j++) {
+                if(j == 0 && i != 0){
+                    System.out.println(" |");
+                }
+                System.out.print("\t"+Array[i][j]);
+            }
+        }
+        System.out.println("\t|\n\n");
+
+
+        //TODO: Run through the array and look at all the adjedent fields and incremment the number in the cell if there is a bomb.
 
     }
 }
