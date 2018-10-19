@@ -17,14 +17,16 @@ public class Board extends JPanel {
     private Image[] img;
     private final int NUM_IMAGES = 13;
     private Game game;
+    private JLabel flagSetStatusbar;
     private JLabel statusbar;
     private boolean debug = true;
 
 /*
 This code has been inspired by https://github.com/janbodnar/Java-Minesweeper-Game
  */
-    Board(Game game){
+    Board(Game game, JLabel flagSetStatusbar){
         this.game = game;
+        this.flagSetStatusbar = flagSetStatusbar;
 
         setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT+90));
 
@@ -59,9 +61,10 @@ This code has been inspired by https://github.com/janbodnar/Java-Minesweeper-Gam
                     }
                     //Toggle the flag
                     int status = game.toggleFlag(fieldID);
-                    repaint();
                     if(status == 0){
-                        System.out.println("You have won! Want to play again?");
+                        repaint();
+                        JOptionPane.showMessageDialog(null, "You have won!");
+                        System.exit(-1);
                     }
 
                 } else {
@@ -76,14 +79,21 @@ This code has been inspired by https://github.com/janbodnar/Java-Minesweeper-Gam
                     if(status == -1){
                         JOptionPane.showMessageDialog(null, "Oh no, you have hit a bomb!");
                         System.exit(-1);
+                    }else if(status == 0){
+                        repaint();
+                        JOptionPane.showMessageDialog(null, "You have won!");
+                        System.exit(-1);
                     }
                 }
             }
+            flagSetStatusbar.setText("Flags set: "+(Integer.toString(game.flagsSet))+"        ");
+            repaint();
         }
     }
 
     @Override
     public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         for (int i = 0; i < N_ROWS; i++) {
             for (int j = 0; j < N_COLS; j++) {
                 int cell = game.gameBoard.get(10*i+j).getFieldImgType();

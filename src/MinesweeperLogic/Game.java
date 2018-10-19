@@ -12,7 +12,12 @@ public class Game {
     static FieldEmpty testEm;
     static FieldBomb testBo;
     static int Boombsleft = 24;
+    final int boombsOnStart = 24;
+    int hiddenFieldsleft = 160;
+    public int flagsSet = 0;
     enum direction{RIGHT,LEFT,DOWN,UP,NON, RIGHTUP,RIGHTDOWN, LEFTUP, LEFTDOWN };
+    boolean debug = true;
+    boolean debug2 = false;
 
     public Game (){
 
@@ -35,8 +40,8 @@ public class Game {
         gameBoard = new ArrayList<>();
 
         //TODO: Generate random fields
-        generate();
-        gameBoard.get(12).setFlagSet(true); Boombsleft--;
+        generate2();
+        //gameBoard.get(12).setFlagSet(true); Boombsleft--;
         //gameBoard.get(37).setFlagSet(true);
         drawAsciiBoard();
         testNr = new FieldINumber(1, -1);
@@ -66,13 +71,23 @@ public class Game {
     public int toggleFlag(int fieldID){
         boolean flagstatus = !gameBoard.get(fieldID).isFlagSet();
         gameBoard.get(fieldID).setFlagSet(flagstatus);
+
+        //Increment/decrement the amount of flags set by the player
+        if(flagstatus){
+            flagsSet++;
+        }else{
+            flagsSet--;
+        }
+
         if(flagstatus && gameBoard.get(fieldID).getClass().equals(testBo.getClass())){
             Boombsleft--;
         }else if(!flagstatus && gameBoard.get(fieldID).getClass().equals(testBo.getClass())){
             Boombsleft++;
         }
-        System.out.println(Boombsleft);
-        if(Boombsleft == 0){
+        //if(debug) System.out.println(Boombsleft);
+        //if(debug) System.out.println(hiddenFieldsleft);
+        if(debug) System.out.println("FlagSet: "+flagsSet);
+        if(Boombsleft == 0 && hiddenFieldsleft == boombsOnStart){
             return 0;
         }else{
             return 1;
@@ -86,7 +101,8 @@ public class Game {
             }else if(gameBoard.get(fieldID).getClass().equals(testNr.getClass()) ){
                 try{
                     if(gameBoard.get(fieldID).isShown()){
-                        visitShownField(fieldID);
+                        int status = visitShownField(fieldID);
+                        if(status == -1) return -1;
                     }else{
                         System.out.println("It was a Number was CALLED!");
                         visitField(fieldID, direction.NON);
@@ -109,7 +125,7 @@ public class Game {
                 }
 
             }else if(gameBoard.get(fieldID).getClass().equals(testBo.getClass())){
-                gameBoard.get(fieldID).setShown();
+                gameBoard.get(fieldID).setShown(); hiddenFieldsleft--;
                 System.err.println("It was a Bomb");
                 return -1;
             }
@@ -117,7 +133,13 @@ public class Game {
         }catch (Exception ex){
 
         }
-        return 0;
+        System.out.println(Boombsleft);
+        System.out.println(hiddenFieldsleft);
+        if(Boombsleft == 0 && hiddenFieldsleft == boombsOnStart){
+            return 0;
+        }else{
+            return 1;
+        }
 
     }
 
@@ -127,72 +149,85 @@ public class Game {
      * the player will lose if one of the fields is a bomb.
      * @param number
      */
-    private void visitShownField(int number) {
+    private int visitShownField(int number) {
+        int status = 0;
 
         //Visit RIGHT
         if((number+1) % 10 != 0 && (number+1) != 0){
-            testField(number+1);
+            status = testField(number+1);
+            if(status == -1) return -1;
         }
 
         //Visit LEFT
         if((number-1) % 10 != 9){
-            testField(number-1);
+            status = testField(number+-1);
+            if(status == -1) return -1;
         }
 
         //Visit UP
-        System.out.println("Visit up blev kaldt");
-        testField(number-10);
+        if(debug2) System.out.println("Visit up blev kaldt");
+        status = testField(number-10);
+        if(status == -1) return -1;
 
         //Visit DOWN
-        System.out.println("Visit downn blev kaldt");
-        testField(number+10);
+        if(debug2) System.out.println("Visit downn blev kaldt");
+        status = testField(number+10);
+        if(status == -1) return -1;
 
         //Visit UP RIGHT
-        System.out.println("Visit UP RIGHT blev kaldt");
+        if(debug2) System.out.println("Visit UP RIGHT blev kaldt");
         if((number-9) % 10 != 0){
-            testField(number-9);
+            status = testField(number-9);
+            if(status == -1) return -1;
         }
 
         //Visit UP LEFT
-        System.out.println("Visit UP LEFT blev kaldt");
+        if(debug2) System.out.println("Visit UP LEFT blev kaldt");
         if((number-11) % 10 != 9){
-            testField(number-11);
+            status = testField(number-11);
+            if(status == -1) return -1;
         }
 
         //Visit DOWN RIGHT
-        System.out.println("Visit DOWN RIGHT blev kaldt");
+        if(debug2) System.out.println("Visit DOWN RIGHT blev kaldt");
         if((number+11) % 10 != 0){
-            testField(number+11);
+            status = testField(number+11);
+            if(status == -1) return -1;
         }
 
         //Visit DOWN LEFT
-        System.out.println("Visit DOWN LEFT blev kaldt");
+        if(debug2) System.out.println("Visit DOWN LEFT blev kaldt");
         if((number+9) % 10 != 9){
-            testField(number+9);
+            status = testField(number+9);
+            if(status == -1) return -1;
         }
 
+        return 0;
 
     }
 
-    private void testField(int number) {
+    private int testField(int number) {
         try{
             //If the flag has been set skip it
             if(gameBoard.get(number).isFlagSet()){
-                return;
+                return 0;
             }else if(gameBoard.get(number).getClass().equals(testBo.getClass())){
+                if(!gameBoard.get(number).isShown()) hiddenFieldsleft--;
                 gameBoard.get(number).setShown();
                 System.err.println("It was a Bomb");
+                return -1;
                 //System.exit(-1);
             }else if(gameBoard.get(number).getClass().equals(testEm.getClass())){
-                System.out.println("Test kaldt");
                 visitField(number, direction.NON);
             }else if(gameBoard.get(number).getClass().equals(testNr.getClass())){
                 System.out.println("A number field has been reveald!");
+                if(!gameBoard.get(number).isShown()) hiddenFieldsleft--;
                 gameBoard.get(number).setShown();
             }
         }catch (Exception ex){
 
         }
+        return 0;
     }
 
     private void visitField(int number, direction direction){
@@ -257,10 +292,12 @@ public class Game {
 
         //They all need to check for these
         if(gameBoard.get(number).getClass().equals(testNr.getClass())){
+            if(!gameBoard.get(number).isShown()) hiddenFieldsleft--;
             //If the field is a number, show it and return
             gameBoard.get(number).setShown();
             return;
         }else if(gameBoard.get(number).getClass().equals(testEm.getClass())){
+            if(!gameBoard.get(number).isShown()) hiddenFieldsleft--;
             gameBoard.get(number).setShown();
         }
 

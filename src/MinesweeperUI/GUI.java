@@ -10,15 +10,22 @@ import javax.swing.*;
 
 public class GUI extends JFrame {
 
+    private final JLabel flagSetStatusbar;
     private JLabel statusbar;
     private Game game;
+    static int flagSet = 0;
 
 
     public GUI(Game game){
         this.game = game;
         statusbar = new JLabel("Minesweeper");
         add(statusbar, BorderLayout.SOUTH);
-        add(new Board(game));
+
+        flagSetStatusbar = new JLabel("Flags set: "+flagSet+"        ");
+        add(flagSetStatusbar, BorderLayout.EAST);
+
+
+        add(new Board(game,flagSetStatusbar));
 
         setResizable(false);
         pack();
