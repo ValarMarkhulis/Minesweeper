@@ -6,6 +6,7 @@ public interface FieldInterface {
     int getId();
     void setValue(char character);
     char getValue();
+    int getFieldImgType();
     void setShown();
     boolean isShown();
     boolean isFlagSet();
