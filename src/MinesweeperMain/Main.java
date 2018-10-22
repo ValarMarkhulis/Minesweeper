@@ -1,6 +1,6 @@
 package MinesweeperMain;
 
-import MinesweeperLogic.*;
+import MinesweeperLogic.Game;
 import MinesweeperUI.GUI;
 
 

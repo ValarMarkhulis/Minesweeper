@@ -6,10 +6,12 @@ public interface FieldInterface {
     int getId();
     void setValue(char character);
     char getValue();
-    int getFieldImgType();
+    int getFieldImgType(boolean endGame);
     void setShown();
     boolean isShown();
     boolean isFlagSet();
     void setFlagSet(boolean flagSet);
+    boolean isPicked();
+    void setPicked(boolean picked);
 
 }

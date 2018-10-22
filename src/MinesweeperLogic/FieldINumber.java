@@ -2,9 +2,9 @@ package MinesweeperLogic;
 
 public class FieldINumber extends Field implements FieldInterface {
 
-    private int fieldNumber;
+    private final int fieldNumber;
 
-    public FieldINumber(int fieldNumber, int fieldId) {
+    FieldINumber(int fieldNumber, int fieldId) {
         this.fieldNumber = fieldNumber;
 
         this.fieldcharacter = (char) (fieldNumber + '0');
@@ -13,9 +13,14 @@ public class FieldINumber extends Field implements FieldInterface {
 
 
     @Override
-    public int getFieldImgType() {
-        // If its shown, return the numeric number
-        if (this.isShown()){
+    public int getFieldImgType(boolean endGame) {
+
+        if(this.isShown() && this.isFlagSet() && endGame){
+            // If its shown and a flag is set, that means that you have lost
+            // and all the fields are being shown
+            return 12;
+        }else if (this.isShown()){
+            // If its shown, return the numeric number
             return fieldNumber;
         }else if(this.isFlagSet()) {
             return 11;

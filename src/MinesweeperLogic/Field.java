@@ -5,17 +5,11 @@ public class Field {
     private boolean isShown = false;
     private int fieldId = 0;
     char fieldcharacter = '?';
-
-    public void setId(int id) {
-        fieldId = id;
-    }
-
-    public int getId() {
-        return fieldId;
-    }
+    boolean picked = false;
 
     public char getValue() {
-        if (isShown){
+        //TODO: Remove the '!' infront of the "isShown" var
+        if (!isShown){
             return fieldcharacter;
         }else if((flagSet)){
             return '\u2691';
@@ -30,4 +24,11 @@ public class Field {
 
     public boolean isFlagSet() {return flagSet;}
     public void setFlagSet(boolean flagSet) {this.flagSet = flagSet;}
+
+    public boolean isPicked() {return picked;}
+    public void setPicked(boolean picked) {this.picked = picked;}
+
+    public void setId(int id) {fieldId = id;}
+
+    public int getId() {return fieldId;}
 }

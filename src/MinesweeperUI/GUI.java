@@ -14,13 +14,12 @@ import java.util.TimerTask;
 public class GUI extends JFrame {
 
     private final JLabel flagSetStatusbar;
-    private JLabel statusbar;
-    private Game game;
-    static int flagSet = 0;
-    Board_Fake BF;
+    private final Game game;
+    static final int flagSet = 0;
+    final Board_Fake BF;
 
-    public Timer timer = new Timer();
-    private JLabel timeLabel = new JLabel(" ");
+    public final Timer timer = new Timer();
+    private final JLabel timeLabel = new JLabel(" ");
 
 
     private class UpdateUITask extends TimerTask {
@@ -36,7 +35,7 @@ public class GUI extends JFrame {
 
     public GUI(Game game){
         this.game = game;
-        statusbar = new JLabel("Minesweeper");
+        JLabel statusbar = new JLabel("Minesweeper");
         add(statusbar, BorderLayout.SOUTH);
 
         flagSetStatusbar = new JLabel("Flags set: "+flagSet+"        ");
@@ -62,7 +61,9 @@ public class GUI extends JFrame {
     public void test(){
         remove(BF);
         game.generateRandomMap(BF.chosenField);
+        game.drawAsciiBoard();
         add(new Board(game,flagSetStatusbar,timer,timeLabel));
+        game.guess(BF.chosenField);
         pack();
         timer.schedule(new UpdateUITask(), 0, 1000);
 
